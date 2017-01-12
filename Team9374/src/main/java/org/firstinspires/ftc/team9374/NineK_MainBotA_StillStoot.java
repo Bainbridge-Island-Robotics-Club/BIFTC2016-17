@@ -16,6 +16,9 @@ public class NineK_MainBotA_StillStoot extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         robot.init(hardwareMap,telemetry);
+
+        robot.init_imu(hardwareMap);
+
         super.waitForStart();
 
         robot.moveToPosition(5,-.4);
@@ -26,7 +29,7 @@ public class NineK_MainBotA_StillStoot extends LinearOpMode {
                 robot.shooter_l.setPower(1);
                 robot.shooter_r.setPower(1);
 
-
+                //Shoots twice, still needs to be tested
                 if (robot.runTime.time() > 5) {
                     robot.elevator.setPower(-.5);
                     if (robot.runTime.time() > 7) {

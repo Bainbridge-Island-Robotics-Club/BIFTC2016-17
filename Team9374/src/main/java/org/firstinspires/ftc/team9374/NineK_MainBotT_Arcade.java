@@ -96,8 +96,8 @@ public class NineK_MainBotT_Arcade extends OpMode {
             robot.shooter_r.setPower(0);
         }
 
-        telemetry.addData("Robot Red:",robot.CSensor.red());
-        telemetry.addData("Robot blue",robot.CSensor.blue());
+        telemetry.addData("Robot Red:",robot.CSensorR.red());
+        telemetry.addData("Robot blue",robot.CSensorR.blue());
 
 
     }

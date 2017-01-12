@@ -36,8 +36,8 @@ public class Encoder_Callib extends OpMode {
             robot.reset_imu();
         }
 
-        telemetry.addData("Color sensor value (R)", robot.CSensor.red());
-        telemetry.addData("Color sensor value (B)", robot.CSensor.blue());
+        telemetry.addData("Color sensor value (R)", robot.CSensorR.red());
+        telemetry.addData("Color sensor value (B)", robot.CSensorR.blue());
     }
 
 }

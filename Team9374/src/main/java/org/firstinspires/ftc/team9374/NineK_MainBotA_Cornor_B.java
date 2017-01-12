@@ -11,7 +11,7 @@ import java.util.Locale;
 /**
  * Created by darwin on 11/21/16.
  */
-@Autonomous(name = "Ninek_MainBotA_Cornor_Vortex_B")
+@Autonomous(name = "Ninek_MainBotA_Cornor_B")
 public class NineK_MainBotA_Cornor_B extends LinearOpMode{
 
         // Uncomment this to add to the opmode list
@@ -34,6 +34,9 @@ public class NineK_MainBotA_Cornor_B extends LinearOpMode{
             //Bunch of Robot Initilaztion code
             //--------------------------------------------------------------------------------------
             robot.init(hardwareMap,telemetry);
+
+            robot.init_imu(hardwareMap);
+
 
             // Wait until we're told to go
             waitForStart();

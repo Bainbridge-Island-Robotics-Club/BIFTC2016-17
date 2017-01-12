@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.Range;
 /*
  * Created by darwin on 10/29/16.
  */
-@Autonomous(name = "NineK_MainBotA_Center",group = "null")
+@Autonomous(name = "NineK_MainBotA_Center_BR",group = "null")
 //This is shoot, then center.
-public class NineK_MainBotA extends LinearOpMode {
+public class NineK_MainBotA_Center_BR extends LinearOpMode {
 
     Hardware9374 robot = new Hardware9374();
 
@@ -25,6 +25,9 @@ public class NineK_MainBotA extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         robot.init(hardwareMap, telemetry);
+
+        robot.init_imu(hardwareMap);
+
         robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         super.waitForStart();
 
@@ -43,20 +46,8 @@ public class NineK_MainBotA extends LinearOpMode {
         }
 
         //move 55 inches
-        int clicks = robot.calcClicksForInches(34.375);
-        //Changed to a wacky num because 55/1.6 due to wheel faisco
-        //Go,go,go,go
-        robot.setALLposition(-clicks);
-        robot.setALLpower(-.5);
+        robot.moveToPosition(55,.6);
 
-        //Printing out our
-        while (opModeIsActive()) {
-            telemetry.addData("Target:", clicks);
-            telemetry.addData("Left Position", robot.left_f.getCurrentPosition());
-            if (robot.left_f.getCurrentPosition() > clicks) {
-                break;
-            }
-        }
 
 
 

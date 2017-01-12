@@ -1,42 +1,61 @@
 package org.firstinspires.ftc.team9374;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /*
  * Created by darwin on 10/29/16.
  */
-@TeleOp(name = "9KT", group = "null")
+@TeleOp(name = "Teleop_Fork_TestV2")
 //@Disabled0
-public class NineK_MainBotT extends OpMode {
+public class NineK_MainBotT_Fork extends OpMode {
     //Drivin
-    Hardware9374 robot = new Hardware9374();
-    public ElapsedTime runTime = new ElapsedTime();
+    //public ElapsedTime runTime = new ElapsedTime();
 
     double gear = 1;
 
-    double rStickY2;
+    DcMotor left_f;
+    DcMotor right_f;
+    DcMotor left_b;
+    DcMotor right_b;
+    //Shooter
+    DcMotor shooter_l;
+    DcMotor shooter_r;
+    //Raising the Fork
+    DcMotor forkL;
+    DcMotor forkR;
+
+    CRServo elevator;
+
     public void init()  {
         //Driving motors
-    robot.init(hardwareMap,telemetry);
+        right_b = hardwareMap.dcMotor.get("Eng1-left");  //Was left_f
+        left_b = hardwareMap.dcMotor.get("Eng1-right");//Was Right_f
+
+        right_f = hardwareMap.dcMotor.get("Eng2-left");  //Was left_b
+        left_f = hardwareMap.dcMotor.get("Eng2-right");//Was right_b
+        //Shooter motors
+        shooter_r = hardwareMap.dcMotor.get("Eng3-left");
+        shooter_l = hardwareMap.dcMotor.get("Eng3-right");
+
+        elevator = hardwareMap.crservo.get("Ser1-center");
+
+
+        //First one(Port 1) in the config is the left motor.
+        //2nd one(Port 2) In the config is the right motor.
+        forkL = hardwareMap.dcMotor.get("ForkL");
+        forkR = hardwareMap.dcMotor.get("ForkR");
 
     }
-
-    @Override
     public void loop() {
         //All Driving code//
         //Driver
 
         double lStickY = -gamepad1.left_stick_y;
         double rStickY = -gamepad1.right_stick_y;
-        rStickY2 = gamepad2.right_stick_y;
 
         //Operator
         double rTrigger = gamepad2.right_trigger;
@@ -44,8 +63,7 @@ public class NineK_MainBotT extends OpMode {
         boolean lBumper = gamepad2.left_bumper;
         boolean rBumper = gamepad2.right_bumper;
 
-        double game1L = gamepad1.left_trigger;
-        double game1R = gamepad1.right_trigger;
+        double rStickY2 = gamepad2.right_stick_y;
 
 
         boolean A = gamepad1.a;
@@ -73,46 +91,38 @@ public class NineK_MainBotT extends OpMode {
         }
         //------Verible driving-------//
 
-        robot.left_f.setPower(lStickY*gear);
-        robot.left_b.setPower(lStickY*gear);
+        left_f.setPower(lStickY*gear);
+        left_b.setPower(lStickY*gear);
 
-        robot.right_f.setPower(rStickY*gear);
-        robot.right_b.setPower(rStickY*gear);
+        right_f.setPower(rStickY*gear);
+        right_b.setPower(rStickY*gear);
 
         //------Verible driving-------//
 
-        robot.forkL.setPower(rStickY2);
-        robot.forkR.setPower(rStickY2);
+        //------Fork------------------//
 
-        robot.BidentR.setPosition(game1R);
-        robot.BidentR.setPosition(game1L);
+        forkL.setPower(rStickY2);
+        forkR.setPower(rStickY2);
 
 
-        robot.elevator.setPower(gamepad2.left_stick_y);
+        elevator.setPower(gamepad2.left_stick_y);
         //Shooter code
 
         if (lBumper)  {
-            robot.shooter_l.setPower(1);
+            shooter_l.setPower(1);
         } else {
-            robot.shooter_l.setPower(0);
+            shooter_l.setPower(0);
         }
 
         if (rBumper)   {
-            robot.shooter_r.setPower(1);
+            shooter_r.setPower(1);
         } else {
-            robot.shooter_r.setPower(0);
+            shooter_r.setPower(0);
         }
-        telemetry.addData("Elevator", robot.elevator.getPower());
+        telemetry.addData("Elevator", elevator.getPower());
+        telemetry.addData("Right trigger", rTrigger);
+        telemetry.addData("Left trigger", lTrigger);
 
-        telemetry.addData("Motor power (LB)", robot.left_b.getPower());
-        telemetry.addData("Motor power (LF)", robot.left_f.getPower());
-        telemetry.addData("Motor power (RF)", robot.right_f.getPower());
-        telemetry.addData("Motor power (RB)", robot.right_b.getPower());
-
-        telemetry.addData("Robot Red:",robot.CSensorR.red());
-        telemetry.addData("Robot Blue:",robot.CSensorR.blue());
-        telemetry.addData("Robot Red:",robot.CSensorL.red());
-        telemetry.addData("Robot Blue",robot.CSensorL.blue());
 
     }
 }

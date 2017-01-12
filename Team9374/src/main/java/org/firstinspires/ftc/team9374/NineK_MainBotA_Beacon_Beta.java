@@ -18,6 +18,8 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, telemetry);
 
+        robot.init_imu(hardwareMap);
+
         waitForStart();
 
         robot.elevator.setPower(0);
@@ -41,8 +43,8 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
                 telemetry.addLine("Made it to loop");
                 robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.waitNSeconds(1);
-                if (robot.CSensor.blue() > robot.Color_level) {
-
+                if (robot.Color_Case() == 11 | robot.Color_Case() == 01 | robot.Color_Case() == 10) {
+                    //This is almost all the cases where we see blue
                     robot.moveToPosition(-15, -.3);
 
                     robot.resetEncoders();
@@ -50,7 +52,7 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                     break;
-                } else if (robot.CSensor.red() > robot.Color_level) {
+                } else if (robot.Color_Case() == 22 | robot.Color_Case() == 20 | robot.Color_Case() == 02) {
                     robot.moveToPosition(-15, -.3);
                     robot.resetEncoders();
 
@@ -62,10 +64,8 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                 } else {
-                    //If we dont see anything.
-                    robot.moveToPosition(-15, -.3);
-
-                    robot.resetEncoders();
+                    //If we dont see anything. Just abort.
+                    stop();
                 }
 
             } //End of the while (true)

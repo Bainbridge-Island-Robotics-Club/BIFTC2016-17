@@ -9,7 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -38,12 +40,18 @@ public class Hardware9374 {
     //Shooter
     DcMotor shooter_l;
     DcMotor shooter_r;
+    //Raising the Fork
+    DcMotor forkL;
+    DcMotor forkR;
     //Speeds
     boolean Sspeed;
     boolean Nspeed = true;
     boolean Fspeed;
 
     CRServo elevator;
+
+    Servo BidentR;
+    Servo BidentL;
 
     ColorSensor CSensorL;
 
@@ -66,8 +74,11 @@ public class Hardware9374 {
 
     final double wheelDiameterInInches = 4;
     final int tpr = 1120;
-    final double wheelCorrection = 0;
     final int Color_level = 3;
+
+    static final double MAX_TURNING_POWER = .5;
+    static final double MIN_TURNING_POWER = .05;
+
     //Not yet defined, will be.
 
     int ticks;
@@ -85,23 +96,48 @@ public class Hardware9374 {
 
         this.telemetry = telemetry;
         //Driving motors
+        telemetry.addLine("Initilizing drive motors...");
+        telemetry.update();
         right_b = hardwareMap.dcMotor.get("Eng1-left");  //Was left_f
         left_b = hardwareMap.dcMotor.get("Eng1-right");//Was Right_f
 
         right_f = hardwareMap.dcMotor.get("Eng2-left");  //Was left_b
         left_f = hardwareMap.dcMotor.get("Eng2-right");//Was right_b
         //Shooter motors
+        telemetry.addLine("Initilizing shooter motors...");
+        telemetry.update();
         shooter_r = hardwareMap.dcMotor.get("Eng3-left");
         shooter_l = hardwareMap.dcMotor.get("Eng3-right");
 
+        telemetry.addLine("Initilizing Elevator controll servo");
+        telemetry.update();
         elevator = hardwareMap.crservo.get("Ser1-center");
 
+        telemetry.addLine("Initilizing the color sensors...");
+        telemetry.update();
         CSensorL = hardwareMap.colorSensor.get("Col1-left");
         CSensorR = hardwareMap.colorSensor.get("Col1-right");
+        //First one(Port 1) in the config is the left motor.
+        //2nd one(Port 2) In the config is the right motor.
+        telemetry.addLine("Initilizing Fork raising motors...");
+        telemetry.update();
+        forkL = hardwareMap.dcMotor.get("ForkL");
+        forkR = hardwareMap.dcMotor.get("ForkR");
+
+        telemetry.addLine("Initilizing Fork release servos");
+        telemetry.update();
+        BidentL = hardwareMap.servo.get("bil");
+        BidentR = hardwareMap.servo.get("bir");
 
         //We need to make different addressess because the Sensor are communicating on the same bus.
-        CSensorR.setI2cAddress(I2cAddr.create7bit(0x3c));
-        CSensorL.setI2cAddress(I2cAddr.create7bit(0x70));
+
+        //In order to set up two light sensors we need to make shure that we talk to the exact
+        //Light sensor that we want. In THis case we are saying
+        //"This light sensor object should be talked to with this I2C Addrecc
+        telemetry.addLine("Configuring The light sensors...");
+        telemetry.update();
+        CSensorR.setI2cAddress(I2cAddr.create8bit(100));
+        CSensorL.setI2cAddress(I2cAddr.create8bit(112));
 
         CSensorL.enableLed(false);
         CSensorR.enableLed(false);
@@ -109,6 +145,9 @@ public class Hardware9374 {
         //center = hardwareMap.servo.get("Ser1-center");
 
         //Might be deprecated
+        telemetry.addLine("Configuring The Drive Motors");
+        telemetry.update();
+
         left_b.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_f.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_b.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -118,22 +157,15 @@ public class Hardware9374 {
         right_f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        /*
-        left_b.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_f.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_b.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left_f.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        */
+
         right_f.setDirection(DcMotorSimple.Direction.REVERSE);
         right_b.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //shooter_l.setDirection(DcMotorSimple.Direction.REVERSE);
 
         shooter_r.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        elevator.setPower(1);
-
-        runTime.reset();
+        //Giving our elevator a start position.
+        //START THE CLOCK
 
         //left.setDirection(DcMotorSimple.Direction.REVERSE);//Or .FORWARD
         //--------------------------------------------------------------------------------------
@@ -147,6 +179,18 @@ public class Hardware9374 {
         //--------------------------------------------------------------------------------------
         //IMU code
         //--------------------------------------------------------------------------------------
+
+        // Set up our telemetry dashboard
+        //START THE CLOCK...Again
+        runTime.reset();
+
+    }
+    //-------------------------------------------------------
+    //                      Action Functions
+    //-------------------------------------------------------
+    public void init_imu(HardwareMap hardwareMap){
+        telemetry.addLine("Initilizing the IMU");
+        telemetry.update();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;               // Defining units
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;  // Defining units
         parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
@@ -160,15 +204,7 @@ public class Hardware9374 {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        // Set up our telemetry dashboard
-
-        runTime.reset();
-
     }
-    //-------------------------------------------------------
-    //                      Action Functions
-    //-------------------------------------------------------
-
 
     public void Turn(int THeading, double speed) {
         //Stands for THeading
@@ -185,6 +221,8 @@ public class Hardware9374 {
 
         //This took a lot of time to come up with one number
         //Just saying.
+        telemetry.addData("Begginning to turn to...",THeading);
+        telemetry.update();
 
         left_b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -199,28 +237,63 @@ public class Hardware9374 {
         if (target > 360) {
             target = target - 360;
         }
+        //Not going to bother to do this logic
+        left_b.setPower(speed);
+        left_f.setPower(speed);
+        right_b.setPower(-speed);
+        right_f.setPower(-speed);
 
         while (true) {
-            //Not going to bother to do this logic
-            left_b.setPower(speed);
-            left_f.setPower(speed);
-            right_b.setPower(-speed);
-            right_f.setPower(-speed);
 
             heading = getcurrentheading();
             telemetry.addData("Current Heading:", heading);
-            if (heading < target + 5 && heading > target - 5) { //Should be withen 10 of the target.
+            telemetry.addData("Target heading", target);
+            if (heading < target + 1 && heading > target - 1) { //Should be withen 10 of the target.
                 break;
             }
         }
 
-        left_b.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_f.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_b.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left_f.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        resetEncoders();
 
     }
+    //Unknown
+    public static double calculateDelta(double targetHeading, double currentHeading) {
 
+        double ih = normalize(targetHeading);
+        double ch = normalize(currentHeading);
+
+        return normalize(ih - ch);
+
+    }
+    //Function to return the heading in a 180 to -180 range.
+    public static double getCurrentHeading_180(BNO055IMU imu) {
+        return AngleUnit.normalizeDegrees(imu.getAngularOrientation()
+                .toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZXY).firstAngle);
+    }
+
+    //Keep in mind that this is in -180 to 180, not
+    //The  360 system that me and cory have done.
+    public void TurnBeta(double degreesRequest){
+        //Obdious
+        telemetry.addData("Begginning to turn to...",degreesRequest);
+        telemetry.update();
+
+        double initialHeading = getCurrentHeading_180(imu);
+        double targetHeading = normalize(initialHeading + degreesRequest);
+
+        while (true) {
+            double delta = calculateDelta(targetHeading, getCurrentHeading_180(imu));
+            if (Math.abs(delta) < 1) {
+                break;
+            }
+            double power = Math.abs(delta / degreesRequest);
+            power = Range.clip(power, MAX_TURNING_POWER, MIN_TURNING_POWER);
+            setALLpower(power * Math.signum(delta));
+            setALLpower(power * Math.signum(delta));
+        }
+    }
+
+    //Takes The Wheel diamater and distance. Turns it into tick
     public int calcClicksForInches(double distanceInInches) {
         //Currently there are 1120 different positions on any given wheel
         double revlutions = distanceInInches / (wheelDiameterInInches * Math.PI); //Find out how many revolutations
@@ -229,85 +302,34 @@ public class Hardware9374 {
     }
 
     public void moveToPosition(double distanceInIN, double power) {
+        telemetry.addLine("Moving to position...");
+        telemetry.update();
         setALLposition(calcClicksForInches(distanceInIN));
         setALLpower(power);
         while (true) {
             if (calcClicksForInches(distanceInIN) < 0) {
+                telemetry.addData("Waiting untill we get to...",calcClicksForInches(distanceInIN));
+                telemetry.update();
                 if (left_f.getCurrentPosition() < calcClicksForInches(distanceInIN)) {
+                    //Stop
                     resetEncoders();
                     setALLpower(0);
 
                     break;
                 }
-            } else if (calcClicksForInches(distanceInIN) > 0)
+            } else if (calcClicksForInches(distanceInIN) > 0) {
+                telemetry.addData("Waiting untill we get to...",calcClicksForInches(distanceInIN));
+                telemetry.update();
                 if (left_f.getCurrentPosition() > calcClicksForInches(distanceInIN)) {
                     resetEncoders();
                     setALLpower(0);
 
                     break;
                 }
-        }
-    }
-
-    public void translate(boolean direction, double power, int inches) {
-        //Currently not finished, need to confirm with camden.
-        //-------------------------
-        //True  = Left
-        //False = Right
-        //-------------------------
-        /*
-        Diagram!!!
-          |  _ ________ _   ^
-          | | |        | |  |
-          v |_|        |_|  |
-              |        |
-              |        |
-          ^  _|        |_
-          | | |        | |  |
-          | |_|________|_|  |
-                            v
-
-         So, to go left the two wheels on the left turn in
-         and the two wheels on the right turn outward
-         as shown.
-
-         For right it is almost the exact same, except the right wheels turn in and the left wheels turn out
-
-          ^  _ ________ _
-          | | |        | | |
-          | |_|        |_| |
-              |        |   v
-              |        |
-             _|        |_  ^
-          | | |        | | |
-          | |_|________|_| |
-          v
-
-         */
-        //Acutall code will continue
-
-        setALLposition(calcClicksForInches(inches));
-        if (direction) {
-            // If ( left ),
-            left_f.setPower(-power);
-            left_b.setPower(power);
-            right_f.setPower(power);
-            right_b.setPower(-power);
-        } else if (!direction) {
-            left_f.setPower(power);
-            left_b.setPower(-power);
-            right_f.setPower(-power);
-            right_b.setPower(power);
-        }
-        while (true) {
-            if (left_f.getCurrentPosition() > calcClicksForInches(inches)) {
-                resetEncoders();
-                break;
             }
         }
-
-
     }
+
 
     public void setALLpower(double power) {
         left_b.setPower(power);
@@ -361,6 +383,7 @@ public class Hardware9374 {
         imu.initialize(parameters);
     }
 
+    //Coach might have done some sort of enum thing with this
     public int Color_Case() {
         //Im going to do this by a number basis.
         // 2 = red
@@ -372,7 +395,7 @@ public class Hardware9374 {
             return 21;
         } else if (CSensorL.blue() > Color_level & CSensorR.blue() > Color_level) {
             return 11;
-        } else if (CSensorL.blue() < Color_level & CSensorL.red() < Color_level & CSensorR.blue() > Color_level) {
+        } else if (CSensorL.blue() < Color_level & CSensorL.red() < Color_level & CSensorR.blue() < Color_level) {
             return 00;
         } else if (CSensorL.blue() > Color_level & CSensorR.blue() < Color_level & CSensorR.red() < Color_level) {
             return 10;
@@ -389,4 +412,21 @@ public class Hardware9374 {
         }
 
     }
+    public void Still_shoot(int delay){
+        waitNSeconds(delay);
+        while (true) {
+            shooter_l.setPower(1);
+            shooter_r.setPower(1);
+            if (runTime.time() > 5) {
+                elevator.setPower(-1);
+                if (runTime.time() > 10) {
+                    break;
+                }
+            }
+        }
+    }
+    public static double normalize(double angle) {
+        return AngleUnit.normalizeDegrees(angle);
+    }
+
 }

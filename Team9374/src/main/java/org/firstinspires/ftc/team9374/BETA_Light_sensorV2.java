@@ -30,7 +30,7 @@ public class BETA_Light_sensorV2 extends LinearOpMode {
 
         robot.setALLpower(.75);
         while (true){
-            if (robot.CSensor.red() > 3 && robot.CSensor.blue() > 3){
+            if (robot.CSensorR.red() > 3 && robot.CSensorR.blue() > 3){
                 // If we get here than we know that we are in the center
                 robot.resetEncoders();  //Standard, reset the encoders and stop the motors
                 robot.setALLpower(0);
@@ -41,11 +41,10 @@ public class BETA_Light_sensorV2 extends LinearOpMode {
         //That has not been finished yet.
         //So im moving on, when it is finished put it here
 
-        if (robot.CSensor.red() > robot.CSensor.blue()){
+        if (robot.CSensorR.red() > robot.CSensorR.blue()){
             // ( If red is on the left side. )
             // Translate to the right, back the exact same distance.
 
-            robot.translate(true,.4,2);
 
             robot.resetEncoders();
             robot.setALLposition(robot.tpr);
@@ -53,7 +52,7 @@ public class BETA_Light_sensorV2 extends LinearOpMode {
             robot.left_f.setPower(1);
             //We just pushed the button!!!
 
-        } else if (robot.CSensor.blue() > robot.CSensor.red()){
+        } else if (robot.CSensorR.blue() > robot.CSensorR.red()){
             // ( If blue is on the left side. )
             // Translate to the right, back the exact same distance.
 
