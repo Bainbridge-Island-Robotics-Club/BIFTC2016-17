@@ -114,7 +114,9 @@ public class SensorAdafruitIMUCalibration extends LinearOpMode
     //----------------------------------------------------------------------------------------------
 
     // Our sensors, motors, and other devices go here, along with other long term state
-    BNO055IMU imu;
+
+        BNO055IMU imu;
+
 
     // State used for updating telemetry
     Orientation angles;

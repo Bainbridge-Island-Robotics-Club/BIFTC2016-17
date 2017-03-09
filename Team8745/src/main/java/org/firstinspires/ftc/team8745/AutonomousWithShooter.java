@@ -34,10 +34,13 @@ public class AutonomousWithShooter extends LinearOpMode {
 
     public int ticks = ticsForInches(60);
 
+<<<<<<< HEAD
+=======
     final double kServoNullPosition = 0.8;
     final double kServoRange = 0.6;
     final double kShooterEnginePower = .7;
 
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
 
     private int ticsForInches(double inches){
         return (int)((inches*TICS_PER_REV)/(Math.PI*WHEEL_DIAMETER));
@@ -61,8 +64,11 @@ public class AutonomousWithShooter extends LinearOpMode {
         //servos
         shooterServo = hardwareMap.servo.get("shooter-servo");
 
+<<<<<<< HEAD
+=======
         //Core device
 
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
         //Running with encoder
         shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFRONT.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -84,7 +90,11 @@ public class AutonomousWithShooter extends LinearOpMode {
         shooterRight.setDirection(DcMotorSimple.Direction.FORWARD);
         shooterLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         //servos in Up position
+<<<<<<< HEAD
+        shooterServo.setPosition(0);
+=======
         shooterServo.setPosition(kServoNullPosition + kServoRange);
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
 
         runtime.reset();
     }
@@ -110,6 +120,16 @@ public class AutonomousWithShooter extends LinearOpMode {
         */
 
         // Shoot Loaded Balls
+<<<<<<< HEAD
+        shooterRight.setPower(1);
+        shooterLeft.setPower(1);
+
+        for (int i = 1; i <= 3; i++) {
+            waitNSeconds(1);
+            shooterServo.setPosition((-1));
+            waitNSeconds(1);
+            shooterServo.setPosition(0);
+=======
         shooterRight.setPower(kShooterEnginePower);
         shooterLeft.setPower(kShooterEnginePower);
 
@@ -118,6 +138,7 @@ public class AutonomousWithShooter extends LinearOpMode {
             shooterServo.setPosition((kServoNullPosition + (-kServoRange)));
             waitNSeconds(1);
             shooterServo.setPosition(kServoNullPosition);
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
         }
 
 
@@ -144,10 +165,17 @@ public class AutonomousWithShooter extends LinearOpMode {
             telemetry.addData("Target:",rightFRONT.getTargetPosition());
             telemetry.addData("Time elapsed:", runtime);
             if (runtime.time() > 10) {
+<<<<<<< HEAD
+                rightFRONT.setPower(1);
+                rightBACK.setPower(1);
+                leftFRONT.setPower(1);
+                leftBACK.setPower(1);
+=======
                 rightFRONT.setPower(.5);
                 rightBACK.setPower(.5);
                 leftFRONT.setPower(.5);
                 leftBACK.setPower(.5);
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
             }
 
             if (leftFRONT.getCurrentPosition() > ticks){

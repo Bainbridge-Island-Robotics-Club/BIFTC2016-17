@@ -54,7 +54,11 @@ public class Katamari_With_Launcher extends OpMode {
             rightFRONT.setPower(left_stick_y);
         }
 
+<<<<<<< HEAD
+        // if pushed right
+=======
 // if pushed right
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
 
         if(left_stick_x>0) {
             if (switcher = false){
@@ -62,7 +66,11 @@ public class Katamari_With_Launcher extends OpMode {
                 rightFRONT.setPower(-left_stick_x);
             } }
 
+<<<<<<< HEAD
+        // if pushed left
+=======
 // if pushed left
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
 
         if(left_stick_x<0){
             if (switcher == false){
