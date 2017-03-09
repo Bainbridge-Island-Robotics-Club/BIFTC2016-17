@@ -38,11 +38,18 @@ public class Practice_Autonomous extends OpMode {
         rightBACK.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFRONT.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBACK.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+<<<<<<< HEAD
         leftFRONT.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBACK.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
+=======
+
+        // Reverse
+        rightFRONT.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBACK.setDirection(DcMotorSimple.Direction.REVERSE);
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
     }
 
     @Override
@@ -65,12 +72,24 @@ public class Practice_Autonomous extends OpMode {
         leftBACK.setPower(1);
 
     }
+<<<<<<< HEAD
+=======
+    if (leftFRONT.getCurrentPosition()== 1000) {
+        rightFRONT.setPower(0);
+        rightBACK.setPower(0);
+        leftFRONT.setPower(0);
+        leftBACK.setPower(0);
+    }
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
 
 telemetry.addData("ticks",rightFRONT.getCurrentPosition());
         telemetry.addData("target",rightFRONT.getTargetPosition());
         telemetry.update();
 
     }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 8e526624d02aa2483d95810cc66c4a6aa67d279c
 }

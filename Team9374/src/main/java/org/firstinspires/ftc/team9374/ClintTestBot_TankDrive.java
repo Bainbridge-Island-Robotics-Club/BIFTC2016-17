@@ -5,14 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-/*
-=======
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-/**
->>>>>>> e920dc6351b8ece876e59ccd20e250de48f454da
- * Created by darwin on 9/20/16.
- */
 
 @TeleOp(name="Clint Test Bot TankDrive", group="Noramal_Opmode")
 
