@@ -57,7 +57,7 @@ public class NineK_MainBotA_ShootCornor_B extends LinearOpMode{
 
             robot.resetEncoders();
 
-            robot.Turn(290,.3);
+            robot.Turn(-110);
 
             robot.resetEncoders();
             //Changed to a wacky num because 55/1.6 due to wheel faisco

@@ -25,11 +25,11 @@ public class NineK_MainBotA_Beacon_R extends LinearOpMode {
         robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         while (super.opModeIsActive()){
             //Move to center
-            robot.moveToPosition(48,.2);
+            robot.moveToPosition(45,.2);
 
             robot.resetEncoders();
             //Turn to beacon
-            robot.Turn(135,.4);
+            robot.Turn(-90);
 
             robot.resetEncoders();
             //Move to beacon
@@ -41,7 +41,7 @@ public class NineK_MainBotA_Beacon_R extends LinearOpMode {
                 telemetry.addLine("Made it to loop");
                 robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.waitNSeconds(1);
-                if (robot.CSensorR.blue() > 4) {
+                if (robot.Color_Case() == 11 | robot.Color_Case() == 01 | robot.Color_Case() == 10) {
 
                     robot.moveToPosition(-15, -.3);
 
@@ -50,7 +50,7 @@ public class NineK_MainBotA_Beacon_R extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                     break;
-                } else if (robot.CSensorR.red() > 4){
+                } else if (robot.Color_Case() == 22 | robot.Color_Case() == 20 | robot.Color_Case() == 02){
                     robot.moveToPosition(-15, -.3);
                     robot.resetEncoders();
 
@@ -62,7 +62,7 @@ public class NineK_MainBotA_Beacon_R extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 } else {
                     //Chaning our eading just a little bit
-                    robot.Turn(320,.1);
+                    robot.Turn(-140);
 
                     robot.moveToPosition(-15, -.3);
                     robot.resetEncoders();

@@ -31,20 +31,41 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
 
             robot.resetEncoders();
             //Turn to beacon
-            robot.Turn(315, .4);
+            robot.Turn(90);
 
             robot.resetEncoders();
             //Move to beacon
-            robot.moveToPosition(48, .3);
+            robot.moveToPosition(40, .3);
 
             robot.resetEncoders();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             while (true) {
-                telemetry.addLine("Made it to loop");
+                telemetry.log().add("Made it to loop");
                 robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.waitNSeconds(1);
                 if (robot.Color_Case() == 11 | robot.Color_Case() == 01 | robot.Color_Case() == 10) {
                     //This is almost all the cases where we see blue
+                    telemetry.log().add("I see Blue...");
+                    telemetry.update();
                     robot.moveToPosition(-15, -.3);
 
                     robot.resetEncoders();
@@ -53,6 +74,8 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
 
                     break;
                 } else if (robot.Color_Case() == 22 | robot.Color_Case() == 20 | robot.Color_Case() == 02) {
+                    telemetry.log().add("I see red...");
+                    telemetry.update();
                     robot.moveToPosition(-15, -.3);
                     robot.resetEncoders();
 
@@ -64,21 +87,30 @@ public class NineK_MainBotA_Beacon_Beta extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                 } else {
-                    //If we dont see anything. Just abort.
-                    stop();
-                }
+                    telemetry.log().add("I see Nothing...");
+                    telemetry.update();
+                    robot.moveToPosition(-15, -.3);
+                    robot.resetEncoders();
 
+                    robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                    robot.moveToPosition(16, .3);
+                    robot.resetEncoders();
+
+                    robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                }
             } //End of the while (true)
 
             robot.reset_imu();
             //moving us in front of the 2nd beacon
-            robot.Turn(90,.1);
+            robot.Turn(270);
             robot.resetEncoders();
 
             robot.moveToPosition(29,.3);
             robot.resetEncoders();
 
-            robot.Turn(0,.1);
+            robot.Turn(0);
             robot.resetEncoders();
 
             robot.moveToPosition(16, .2);

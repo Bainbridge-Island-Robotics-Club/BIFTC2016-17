@@ -44,6 +44,9 @@ public class NineK_MainBotT extends OpMode {
         boolean lBumper = gamepad2.left_bumper;
         boolean rBumper = gamepad2.right_bumper;
 
+        boolean LDpadD = gamepad2.dpad_down;
+        boolean LDpadU = gamepad2.dpad_up;
+
         double game1L = gamepad1.left_trigger;
         double game1R = gamepad1.right_trigger;
 
@@ -84,9 +87,19 @@ public class NineK_MainBotT extends OpMode {
         robot.forkL.setPower(rStickY2);
         robot.forkR.setPower(rStickY2);
 
-        robot.BidentR.setPosition(game1R);
-        robot.BidentR.setPosition(game1L);
 
+        if (LDpadU) {
+            //Raising.
+            robot.BidentR.setPosition(1);
+
+            robot.BidentL.setPosition(0);
+        }
+        if (LDpadD) {
+            //Releasing
+            robot.BidentR.setPosition(0);
+
+            robot.BidentL.setPosition(1);
+        }
 
         robot.elevator.setPower(gamepad2.left_stick_y);
         //Shooter code
@@ -109,10 +122,15 @@ public class NineK_MainBotT extends OpMode {
         telemetry.addData("Motor power (RF)", robot.right_f.getPower());
         telemetry.addData("Motor power (RB)", robot.right_b.getPower());
 
-        telemetry.addData("Robot Red:",robot.CSensorR.red());
-        telemetry.addData("Robot Blue:",robot.CSensorR.blue());
-        telemetry.addData("Robot Red:",robot.CSensorL.red());
-        telemetry.addData("Robot Blue",robot.CSensorL.blue());
+        telemetry.addData("Robot Right Red:",robot.CSensorR.red());
+        telemetry.addData("Robot Right Blue:",robot.CSensorR.blue());
+        telemetry.addData("Robot Left Blue",robot.CSensorL.blue());
+        telemetry.addData("Robot Left Red",robot.CSensorL.red());
+
+        telemetry.addData("Color Case", robot.Color_Case());
+
+        telemetry.addData("Left Holder POS", robot.BidentL.getPosition());
+        telemetry.addData("Right Holder POS", robot.BidentR.getPosition());
 
     }
 }

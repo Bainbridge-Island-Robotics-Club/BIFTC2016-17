@@ -85,7 +85,7 @@ public class IMU_Cornor_Auto extends LinearOpMode{
 
                 robot.resetEncoders();
 
-                robot.Turn(95,.3);
+                robot.Turn(95);
 
                 robot.resetEncoders();
 

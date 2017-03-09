@@ -31,7 +31,7 @@ public class NineK_MainBotA_ShootBeacon_R extends LinearOpMode {
 
             robot.resetEncoders();
             //Turn to beacon
-            robot.Turn(135,.4);
+            robot.Turn(135);
 
             robot.resetEncoders();
             //Move to beacon
@@ -64,7 +64,7 @@ public class NineK_MainBotA_ShootBeacon_R extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 } else {
                     //Chaning our eading just a little bit
-                    robot.Turn(320,.1);
+                    robot.Turn(140);
 
                     robot.moveToPosition(-15, -.3);
                     robot.resetEncoders();

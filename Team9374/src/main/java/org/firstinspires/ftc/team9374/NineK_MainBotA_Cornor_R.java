@@ -74,7 +74,7 @@ public class NineK_MainBotA_Cornor_R extends LinearOpMode{
 
                 robot.resetEncoders();
 
-                robot.Turn(95,.3);
+                robot.Turn(90);
 
                 robot.resetEncoders();
                 //Changed to a wacky num because 55/1.6 due to wheel faisco

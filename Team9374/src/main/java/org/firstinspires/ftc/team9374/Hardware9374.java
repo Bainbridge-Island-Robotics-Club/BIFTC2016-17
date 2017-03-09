@@ -44,10 +44,6 @@ public class Hardware9374 {
     DcMotor forkL;
     DcMotor forkR;
     //Speeds
-    boolean Sspeed;
-    boolean Nspeed = true;
-    boolean Fspeed;
-
     CRServo elevator;
 
     Servo BidentR;
@@ -68,6 +64,7 @@ public class Hardware9374 {
     double LBpower;
     double RBpower;
 
+    int Beacon_Col;
 
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -76,8 +73,8 @@ public class Hardware9374 {
     final int tpr = 1120;
     final int Color_level = 3;
 
-    static final double MAX_TURNING_POWER = .5;
-    static final double MIN_TURNING_POWER = .05;
+    static final double MAX_TURNING_POWER = .4; //May be changed based on robot tworke.
+    static final double MIN_TURNING_POWER = .15;
 
     //Not yet defined, will be.
 
@@ -129,6 +126,8 @@ public class Hardware9374 {
         BidentL = hardwareMap.servo.get("bil");
         BidentR = hardwareMap.servo.get("bir");
 
+        BidentR.setPosition(1);
+        BidentL.setPosition(0);
         //We need to make different addressess because the Sensor are communicating on the same bus.
 
         //In order to set up two light sensors we need to make shure that we talk to the exact
@@ -182,13 +181,16 @@ public class Hardware9374 {
 
         // Set up our telemetry dashboard
         //START THE CLOCK...Again
+        telemetry.addLine("Finished init!");
+        telemetry.update();
         runTime.reset();
 
     }
+
     //-------------------------------------------------------
     //                      Action Functions
     //-------------------------------------------------------
-    public void init_imu(HardwareMap hardwareMap){
+    public void init_imu(HardwareMap hardwareMap) {
         telemetry.addLine("Initilizing the IMU");
         telemetry.update();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;               // Defining units
@@ -206,7 +208,7 @@ public class Hardware9374 {
 
     }
 
-    public void Turn(int THeading, double speed) {
+    public void TurnBeta(int THeading, double speed) {
         //Stands for THeading
         //EX: change = 90 and speed is 0.
         /*
@@ -221,7 +223,7 @@ public class Hardware9374 {
 
         //This took a lot of time to come up with one number
         //Just saying.
-        telemetry.addData("Begginning to turn to...",THeading);
+        telemetry.addData("Begginning to turn to...", THeading);
         telemetry.update();
 
         left_b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -256,6 +258,7 @@ public class Hardware9374 {
         resetEncoders();
 
     }
+
     //Unknown
     public static double calculateDelta(double targetHeading, double currentHeading) {
 
@@ -265,6 +268,7 @@ public class Hardware9374 {
         return normalize(ih - ch);
 
     }
+
     //Function to return the heading in a 180 to -180 range.
     public static double getCurrentHeading_180(BNO055IMU imu) {
         return AngleUnit.normalizeDegrees(imu.getAngularOrientation()
@@ -273,23 +277,40 @@ public class Hardware9374 {
 
     //Keep in mind that this is in -180 to 180, not
     //The  360 system that me and cory have done.
-    public void TurnBeta(double degreesRequest){
+    public void Turn(double degreesRequest) {
+        //-------------------CLINTS TURN---------------------------//
         //Obdious
-        telemetry.addData("Begginning to turn to...",degreesRequest);
-        telemetry.update();
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        telemetry.addData("Begginning to turn to...", degreesRequest);
 
         double initialHeading = getCurrentHeading_180(imu);
-        double targetHeading = normalize(initialHeading + degreesRequest);
+        double targetHeading = normalize(initialHeading + normalize(degreesRequest));
 
         while (true) {
             double delta = calculateDelta(targetHeading, getCurrentHeading_180(imu));
+            telemetry.addData("Current heading is... ", getCurrentHeading_180(imu));
+            telemetry.update();
             if (Math.abs(delta) < 1) {
+                setALLpower(0);
+                resetEncoders();
                 break;
             }
+
             double power = Math.abs(delta / degreesRequest);
-            power = Range.clip(power, MAX_TURNING_POWER, MIN_TURNING_POWER);
-            setALLpower(power * Math.signum(delta));
-            setALLpower(power * Math.signum(delta));
+            power = power * power;
+            power = Range.clip(power, MIN_TURNING_POWER, MAX_TURNING_POWER);
+            //setALLpower(power * Math.signum(delta));
+            left_b.setPower(-power * Math.signum(delta));
+            left_f.setPower(-power * Math.signum(delta));
+            //setALLpower(power * Math.signum(delta));
+            right_b.setPower(power * Math.signum(delta));
+            right_f.setPower(power * Math.signum(delta));
+
+            telemetry.addData("Current heading is... ", getCurrentHeading_180(imu));
+            telemetry.addData("target heading is... ", targetHeading);
+            telemetry.addData("power", power);
+            telemetry.update();
         }
     }
 
@@ -308,7 +329,7 @@ public class Hardware9374 {
         setALLpower(power);
         while (true) {
             if (calcClicksForInches(distanceInIN) < 0) {
-                telemetry.addData("Waiting untill we get to...",calcClicksForInches(distanceInIN));
+                telemetry.addData("Waiting untill we get to...", calcClicksForInches(distanceInIN));
                 telemetry.update();
                 if (left_f.getCurrentPosition() < calcClicksForInches(distanceInIN)) {
                     //Stop
@@ -318,7 +339,7 @@ public class Hardware9374 {
                     break;
                 }
             } else if (calcClicksForInches(distanceInIN) > 0) {
-                telemetry.addData("Waiting untill we get to...",calcClicksForInches(distanceInIN));
+                telemetry.addData("Waiting untill we get to...", calcClicksForInches(distanceInIN));
                 telemetry.update();
                 if (left_f.getCurrentPosition() > calcClicksForInches(distanceInIN)) {
                     resetEncoders();
@@ -384,14 +405,18 @@ public class Hardware9374 {
     }
 
     //Coach might have done some sort of enum thing with this
+    /*
     public int Color_Case() {
         //Im going to do this by a number basis.
         // 2 = red
         // 1 = blue
         // 0 =  unknown
-        if ((CSensorL.red() > Color_level) & (CSensorR.red() > Color_level)) {
+        if ((CSensorL.red() > Color_level) &
+                (CSensorR.red() > Color_level) &
+                (CSensorR.blue() < Color_level) &
+                (CSensorL.blue() < Color_level)) {
             return 22;
-        } else if (CSensorL.red() > Color_level & CSensorR.blue() > Color_level) {
+        } else if (CSensorL.red() > Color_level & CSensorL.blue() < Color_level & CSensorR.red() < Color_level & CSensorR.blue() > Color_level) {
             return 21;
         } else if (CSensorL.blue() > Color_level & CSensorR.blue() > Color_level) {
             return 11;
@@ -405,28 +430,54 @@ public class Hardware9374 {
             return 20;
         } else if (CSensorL.blue() > Color_level & CSensorR.red() > Color_level) {
             return 12;
-        } else if (CSensorL.blue() < Color_level & CSensorL.red() < Color_level & CSensorR.red() > Color_level) {
+        } else if (CSensorL.blue() < Color_level & CSensorL.red() < Color_level & CSensorR.red() > Color_level & CSensorR.blue() < Color_level) {
             return 02;
         } else {
             return 0;
         }
 
     }
-    public void Still_shoot(int delay){
+    */
+    public void Still_shoot(int delay) {
         waitNSeconds(delay);
         while (true) {
             shooter_l.setPower(1);
             shooter_r.setPower(1);
             if (runTime.time() > 5) {
                 elevator.setPower(-1);
-                if (runTime.time() > 10) {
+                if (runTime.time() > 15) {
                     break;
                 }
             }
         }
     }
+
     public static double normalize(double angle) {
         return AngleUnit.normalizeDegrees(angle);
     }
 
+    public int Color_Case() {
+        //Im going to do this by a number basis.
+        // 2 = red
+        // 1 = blue
+        // 0 =  unknown
+        Beacon_Col = 0;
+            //Left side
+        if (CSensorL.red() > Color_level) {
+            Beacon_Col += 20;
+        }
+        if (CSensorL.blue() > Color_level) {
+            Beacon_Col += 10;
+            //Right side.
+        }
+        if (CSensorR.red() > Color_level) {
+            Beacon_Col += 2;
+        }
+        if (CSensorR.blue() > Color_level) {
+            Beacon_Col += 1;
+        }
+        return Beacon_Col;
+    }
 }
+
+

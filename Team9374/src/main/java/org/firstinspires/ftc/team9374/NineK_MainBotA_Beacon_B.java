@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * Created by darwin on 12/17/16.
  */
-@Autonomous(name = "NineK_MainBotA_Beacon_B")
+@Autonomous(name = "NineK_MainBotA_Beacon_B2v")
 public class NineK_MainBotA_Beacon_B extends LinearOpMode {
     Hardware9374 robot = new Hardware9374();
 
@@ -24,11 +24,12 @@ public class NineK_MainBotA_Beacon_B extends LinearOpMode {
         robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         while (super.opModeIsActive()) {
             //Move to center
-            robot.moveToPosition(48, .2);
+            robot.moveToPosition(45, .2);
 
             robot.resetEncoders();
             //Turn to beacon
-            robot.Turn(315, .4);
+            //This is counter-clockwise
+            robot.Turn(90);
 
             robot.resetEncoders();
             //Move to beacon
@@ -40,8 +41,9 @@ public class NineK_MainBotA_Beacon_B extends LinearOpMode {
                 telemetry.addLine("Made it to loop");
                 robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.waitNSeconds(1);
-                if (robot.CSensorR.blue() > 4) {
-
+                if (robot.Color_Case() == 11 | robot.Color_Case() == 1 | robot.Color_Case() == 10) {
+                    telemetry.log().add("I see blue...");
+                    telemetry.update();
                     robot.moveToPosition(-15, -.4);
 
                     robot.resetEncoders();
@@ -49,7 +51,9 @@ public class NineK_MainBotA_Beacon_B extends LinearOpMode {
                     robot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                     break;
-                } else  {
+                } else if (robot.Color_Case() == 22 | robot.Color_Case() == 20 | robot.Color_Case() == 2)  {
+                    telemetry.log().add("I see red...");
+                    telemetry.update();
                     robot.moveToPosition(-15, -.4);
                     robot.resetEncoders();
 

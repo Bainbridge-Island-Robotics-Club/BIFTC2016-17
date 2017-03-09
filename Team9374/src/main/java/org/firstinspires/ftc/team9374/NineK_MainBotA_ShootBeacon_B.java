@@ -32,7 +32,7 @@ public class NineK_MainBotA_ShootBeacon_B extends LinearOpMode {
 
             robot.resetEncoders();
             //Turn to beacon
-            robot.Turn(315, .4);
+            robot.Turn(-90);
 
             robot.resetEncoders();
             //Move to beacon

@@ -12,7 +12,7 @@ import java.util.Locale;
  * Created by darwin on 11/21/16.
  */
 @Autonomous(name = "Ninek_MainBotA_Cornor_B")
-public class NineK_MainBotA_Cornor_B extends LinearOpMode{
+public class NineK_MainBotA_CornorShootB extends LinearOpMode{
 
         // Uncomment this to add to the opmode list
 
@@ -70,7 +70,11 @@ public class NineK_MainBotA_Cornor_B extends LinearOpMode{
                 */
                 //Changed to a wacky num because 55/1.6 due to wheel faisco
 
-                robot.moveToPosition(12.5,.5);
+                robot.moveToPosition(2,.5);
+
+
+                robot.Still_shoot(0);
+
 
                 robot.resetEncoders();
 

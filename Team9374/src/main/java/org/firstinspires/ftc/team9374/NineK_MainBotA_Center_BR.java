@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.util.Range;
 /*
  * Created by darwin on 10/29/16.
  */
-@Autonomous(name = "NineK_MainBotA_Center_BR",group = "null")
+@Autonomous(name = "NineK_MainBotA_Center_BR")
 //This is shoot, then center.
 public class NineK_MainBotA_Center_BR extends LinearOpMode {
 
@@ -32,21 +32,22 @@ public class NineK_MainBotA_Center_BR extends LinearOpMode {
         super.waitForStart();
 
 
-
+        robot.moveToPosition(10,.3);
         //Spinning the motors
-        while (true) {
+        while (super.opModeIsActive()) {
             robot.shooter_l.setPower(1);
             robot.shooter_r.setPower(1);
             if (robot.runTime.time() > 5) {
                 robot.elevator.setPower(-1);
-                if (robot.runTime.time() > 10) {
+                if (robot.runTime.time() > 15) {
                     break;
                 }
             }
         }
 
         //move 55 inches
-        robot.moveToPosition(55,.6);
+        robot.resetEncoders();
+        robot.moveToPosition(35,.6);
 
 
 
